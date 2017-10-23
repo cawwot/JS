@@ -1,6 +1,6 @@
 import express from 'express';
 import path from 'path';
-import open from 'open';
+//import open from 'open';
 import webpack from 'webpack';
 import config from '../webpack.config.dev';
 
@@ -23,6 +23,7 @@ app.listen(port, function(err) {
 	if (err) {
 		console.log(err);
 	} else {
-		open('http://localhost: + port');
+		//	open('http://localhost: + port');
+		console.log("Ready to go!");
 	}
 })
