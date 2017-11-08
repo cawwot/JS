@@ -1,21 +1,35 @@
 import path from 'path';
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import WebpackMd5Hash from 'webpack-md5-hash';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 
 export default {
 	debug: true,
 	devtools: 'source-map',
 	noInfo: false,
-	entry: [
-		path.resolve(__dirname, 'src/index')
-	],
+	entry: {
+		main: path.resolve(__dirname, 'src/index'),
+		vendor:path.resolve(__dirname, 'src/vendor')
+	},
 	target :'web',
 	output: {
 		path: path.resolve(__dirname, 'dist'),
 		publicPath: '/',
-		filename: 'bundle.js'
+		filename: '[name].[chunkhash].js'
 	},
 	plugins: [
+		//keep css seperate
+		new ExtractTextPlugin('[name].[contenthash].css'),
+
+		//hashing for cache-busting
+		new WebpackMd5Hash(),
+
+		//use bundling
+		new webpack.optimize.CommonsChunkPlugin({
+			name: 'vendor'
+		}),
+
 		//Minify
 		new webpack.optimize.UglifyJsPlugin(),
 
@@ -37,13 +51,15 @@ export default {
 				minifyCSS: true,
 				minifyURLs: true
 			},
-			inject: true
+			inject: true,
+			trackJSToken: '4f2decae9af04ea8a28139ba6fb9d3a6'
 		})
 	],
 	module: {
 		loaders: [
 			{test: /\.js$/, exclude: /node_modules/, loaders: ['babel']},
-			{test: /\.css$/, loaders: ['style','css']}
+			{test: /\.css$/, loader: ExtractTextPlugin.extract('css?sourceMap')}
+
 		]
 	}
 }
